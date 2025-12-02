@@ -28,6 +28,19 @@ class DetailedTaskViewController: UIViewController {
         return view
     }()
     
+    private lazy var backButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Назад", for: .normal)
+        button.setImage(UIImage(systemName: "chevron.left"), for: .normal)
+        button.tintColor = .counter
+        button.layer.masksToBounds = true
+        button.semanticContentAttribute = .forceLeftToRight
+        button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        return button
+    }()
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -45,7 +58,7 @@ class DetailedTaskViewController: UIViewController {
         return label
     }()
     
-    private let descriptionTextView: UITextView = {
+    private lazy var descriptionTextView: UITextView = {
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.font = UIFont.systemFont(ofSize: 22, weight: .regular)
@@ -60,6 +73,7 @@ class DetailedTaskViewController: UIViewController {
         textView.showsVerticalScrollIndicator = false
         textView.showsHorizontalScrollIndicator = false
         textView.autocapitalizationType = .sentences
+        textView.delegate = self
         return textView
     }()
     
@@ -71,9 +85,23 @@ class DetailedTaskViewController: UIViewController {
         presenter?.viewDidLoad()
     }
     
+    private func setupNavigationBar() {
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        view.addSubview(backButton)
+    }
+    
+    @objc private func backButtonTapped() {
+        if let navController = navigationController {
+            navController.popViewController(animated: true)
+        } else {
+            dismiss(animated: true, completion: nil)
+        }
+    }
     // MARK: - Setup
     private func setupUI() {
         view.backgroundColor = .black
+        
+        setupNavigationBar()
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
@@ -81,10 +109,15 @@ class DetailedTaskViewController: UIViewController {
         contentView.addSubview(dateLabel)
         contentView.addSubview(descriptionTextView)
         
-        descriptionTextView.delegate = self
+       
         
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            backButton.widthAnchor.constraint(equalToConstant: 81),
+            backButton.heightAnchor.constraint(equalToConstant: 44),
+            
+            scrollView.topAnchor.constraint(equalTo: backButton.bottomAnchor, constant: 10),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -107,7 +140,6 @@ class DetailedTaskViewController: UIViewController {
             descriptionTextView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             descriptionTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             descriptionTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
-    
         ])
     }
 }

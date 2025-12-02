@@ -15,7 +15,7 @@ class TaskViewController: UIViewController {
     // MARK: - Properties
     var presenter: TaskPresenterInputProtocol?
     private var tasks: [TodoTask] = []
-    private var currentlyHighlightedIndexPath: IndexPath?
+    let blurTag = 9999
     
     // MARK: - UI Components
     private lazy var searchBar: UISearchBar = {
@@ -397,19 +397,19 @@ extension TaskViewController: TaskUpdateDelegate {
     }
 }
 
-/// MARK: - Blur helpers - FAST VERSION
+// MARK: - Blur helpers
 extension TaskViewController {
     private func addBlur() {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else { return }
         
-        if window.viewWithTag(9999) != nil {
+        if window.viewWithTag(self.blurTag) != nil {
             return
         }
         
         let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
         blurView.frame = window.bounds
-        blurView.tag = 9999
+        blurView.tag = self.blurTag
         blurView.alpha = 0
         window.addSubview(blurView)
         
@@ -421,7 +421,7 @@ extension TaskViewController {
     private func removeBlurFast() {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first,
-              let blurView = window.viewWithTag(9999) as? UIVisualEffectView else { return }
+              let blurView = window.viewWithTag(self.blurTag) as? UIVisualEffectView else { return }
         
         UIView.animate(withDuration: 0.1, animations: {
             blurView.alpha = 0
