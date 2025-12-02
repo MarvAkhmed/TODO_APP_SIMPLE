@@ -20,7 +20,7 @@ final class DetailedTaskPresenter: DetailedTaskPresenterInputProtocol, DetailedT
     weak var view: DetailedTaskPresenterOutputProtocol?
     var interactor: DetailedTaskInteractorInputProtocol?
     var router: DetailedTaskRouterProtocol?
-    
+    weak var taskUpdateDelegate: TaskUpdateDelegate?
     private let taskId: String
     private var task: TodoTask?
     
@@ -37,6 +37,10 @@ final class DetailedTaskPresenter: DetailedTaskPresenterInputProtocol, DetailedT
     func didUpdateDescription(_ description: String) {
         guard let task = task else { return }
         interactor?.updateDescription(for: task, description: description)
+        
+        if let taskId = UUID(uuidString: taskId) {
+            taskUpdateDelegate?.didUpdateTaskDescription(for: taskId, newDescription: description)
+        }
     }
     
     // MARK: - Interactor Output

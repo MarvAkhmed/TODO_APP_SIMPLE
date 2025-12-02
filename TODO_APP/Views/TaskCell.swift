@@ -79,11 +79,10 @@ class TaskCell: UITableViewCell {
     func configure(with task: TodoTask) {
         checkboxButton.isSelected = task.isCompleted
         dashCompleted(at: task)
-        descriptionLabel.text = task.description
-        descriptionLabel.textColor = task.isCompleted ? .lightGray : .white
+        configDescription(for: task)
+        
         createdAtLabel.text = task.createdAt.formattedTaskDate
     }
-    
     // MARK: - Actions
     @objc private func checkboxTapped() {
         onCheckboxTapped?()
@@ -114,16 +113,27 @@ class TaskCell: UITableViewCell {
         if task.isCompleted {
             let attributedString = NSMutableAttributedString(string: task.title)
             attributedString.addAttribute(.strikethroughStyle,
-                                         value: NSUnderlineStyle.single.rawValue,
-                                         range: NSRange(location: 0, length: attributedString.length))
+                                          value: NSUnderlineStyle.single.rawValue,
+                                          range: NSRange(location: 0, length: attributedString.length))
             attributedString.addAttribute(.foregroundColor,
-                                         value: UIColor.lightGray,
-                                         range: NSRange(location: 0, length: attributedString.length))
+                                          value: UIColor.lightGray,
+                                          range: NSRange(location: 0, length: attributedString.length))
             titleLabel.attributedText = attributedString
         } else {
             titleLabel.attributedText = nil
             titleLabel.text = task.title
             titleLabel.textColor = .white
         }
+    }
+    
+    private func configDescription(for task: TodoTask ) {
+        if let description = task.description, !description.isEmpty {
+            descriptionLabel.text = description
+            descriptionLabel.isHidden = false
+        } else {
+            descriptionLabel.text = nil
+            descriptionLabel.isHidden = true
+        }
+        descriptionLabel.textColor = task.isCompleted ? .lightGray : .white
     }
 }

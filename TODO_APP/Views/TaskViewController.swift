@@ -6,6 +6,10 @@
 
 import UIKit
 
+protocol TaskUpdateDelegate: AnyObject {
+    func didUpdateTaskDescription(for taskId: UUID, newDescription: String?)
+}
+
 class TaskViewController: UIViewController {
     
     // MARK: - Properties
@@ -103,9 +107,10 @@ class TaskViewController: UIViewController {
     }
     
     // MARK: - Lifecycle
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
+    override func viewWillAppear(_ animated: Bool) {
+         super.viewWillAppear(animated)
+         presenter?.viewDidLoad()
+     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -114,6 +119,16 @@ class TaskViewController: UIViewController {
         setupUI()
         presenter?.viewDidLoad()
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeBlur()
+        
+        for indexPath in tableView.indexPathsForVisibleRows ?? [] {
+            restoreCellBackground(at: indexPath)
+        }
+    }
+
     
     // MARK: - UI Layouts
     private func setupUI() {
@@ -237,12 +252,11 @@ extension TaskViewController: UITableViewDataSource, UITableViewDelegate {
         }
         return cell
     }
-
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let task = tasks[indexPath.row]
-        
-        let detailedVC = DetailedTaskRouter.createModule(taskId: task.id.uuidString) 
+        let detailedVC = DetailedTaskRouter.createModule(taskId: task.id.uuidString, delegate: self)
         detailedVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(detailedVC, animated: true)
     }
@@ -259,10 +273,19 @@ extension TaskViewController: UITableViewDataSource, UITableViewDelegate {
         
         return UISwipeActionsConfiguration(actions: [deleteAction])
     }
+
     
-    // MARK: - Native iOS Context Menu (UIMenu)
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let task = tasks[indexPath.row]
+        addBlur()
+        
+        if let cell = tableView.cellForRow(at: indexPath) as? TaskCell {
+            cell.contentView.backgroundColor = Colors.footerBackground
+            let backgroundView = UIView()
+            backgroundView.backgroundColor = Colors.footerBackground
+            cell.selectedBackgroundView = backgroundView
+            cell.backgroundColor = Colors.footerBackground
+        }
         
         return UIContextMenuConfiguration(
             identifier: nil,
@@ -272,6 +295,7 @@ extension TaskViewController: UITableViewDataSource, UITableViewDelegate {
                     title: "Редактировать",
                     image: UIImage(systemName: "pencil")
                 ) { _ in
+                    self?.removeBlurAndRestoreCell(at: indexPath)
                     self?.editTask(task)
                 }
                 
@@ -279,6 +303,7 @@ extension TaskViewController: UITableViewDataSource, UITableViewDelegate {
                     title: "Поделиться",
                     image: UIImage(systemName: "square.and.arrow.up")
                 ) { _ in
+                    self?.removeBlurAndRestoreCell(at: indexPath)
                     self?.shareTask(task)
                 }
                 
@@ -287,12 +312,27 @@ extension TaskViewController: UITableViewDataSource, UITableViewDelegate {
                     image: UIImage(systemName: "trash"),
                     attributes: .destructive
                 ) { _ in
+                    self?.removeBlurAndRestoreCell(at: indexPath)
                     self?.presenter?.didDeleteTask(task)
                 }
                 
                 return UIMenu(title: "", children: [editAction, shareAction, deleteAction])
             }
         )
+    }
+
+    func tableView(_ tableView: UITableView, willEndContextMenuInteraction configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
+        removeBlur()
+        
+        animator?.addCompletion { [weak self] in
+            for indexPath in self?.tableView.indexPathsForVisibleRows ?? [] {
+                self?.restoreCellBackground(at: indexPath)
+            }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        88
     }
 }
 
@@ -325,5 +365,81 @@ extension TaskViewController: UISearchBarDelegate {
         if searchBar.isFirstResponder {
             searchBar.resignFirstResponder()
         }
+    }
+}
+
+extension TaskViewController: TaskUpdateDelegate {
+    func didUpdateTaskDescription(for taskId: UUID, newDescription: String?) {
+        DispatchQueue.main.async { [weak self] in
+            if let index = self?.tasks.firstIndex(where: { $0.id == taskId }) {
+                self?.tasks[index].description = newDescription
+                let indexPath = IndexPath(row: index, section: 0)
+                self?.tableView.reloadRows(at: [indexPath], with: .none)
+                self?.updateFooter(self?.tasks.count ?? 0)
+            }
+        }
+    }
+}
+// MARK: - Blur helpers with animation
+extension TaskViewController {
+    private func addBlur() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else { return }
+        
+        // Check if blur already exists
+        if window.viewWithTag(9999) != nil {
+            return
+        }
+        
+        let blurView = UIVisualEffectView(effect: nil)
+        blurView.frame = window.bounds
+        blurView.tag = 9999
+        blurView.alpha = 0
+        window.addSubview(blurView)
+        
+        // Animate the blur effect
+        UIView.animate(withDuration: 0.3) {
+            blurView.effect = UIBlurEffect(style: .dark)
+            blurView.alpha = 1
+        }
+        
+        // Optionally, bring the context menu cell to front
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.cellForRow(at: indexPath)?.layer.zPosition = 1
+        }
+    }
+    
+    private func removeBlur() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first,
+              let blurView = window.viewWithTag(9999) as? UIVisualEffectView else { return }
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            blurView.effect = nil
+            blurView.alpha = 0
+        }) { _ in
+            blurView.removeFromSuperview()
+            
+            // Reset z-position for all cells
+            self.tableView.visibleCells.forEach { cell in
+                cell.layer.zPosition = 0
+            }
+        }
+    }
+    
+    private func restoreCellBackground(at indexPath: IndexPath) {
+        if let cell = tableView.cellForRow(at: indexPath) as? TaskCell {
+            UIView.animate(withDuration: 0.2) {
+                cell.contentView.backgroundColor = .black
+                cell.backgroundColor = .black
+            }
+            cell.selectedBackgroundView = nil
+            cell.backgroundView = nil
+        }
+    }
+    
+    private func removeBlurAndRestoreCell(at indexPath: IndexPath) {
+        removeBlur()
+        restoreCellBackground(at: indexPath)
     }
 }
