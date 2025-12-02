@@ -30,7 +30,7 @@ class DetailedTaskViewController: UIViewController {
     private lazy var backButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Назад", for: .normal)
+        button.setTitle("  Назад", for: .normal)
         button.setImage(UIImage(systemName: "chevron.left"), for: .normal)
         button.tintColor = .counter
         button.layer.masksToBounds = true
@@ -196,7 +196,6 @@ extension DetailedTaskViewController: DetailedTaskPresenterOutputProtocol {
             descriptionTextView.textColor = .lightGray
         }
     }
-    
     
     func displayError(_ message: String) {
         DispatchQueue.main.async { [weak self] in
