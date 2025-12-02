@@ -13,7 +13,6 @@ class DetailedTaskViewController: UIViewController {
     var presenter: DetailedTaskPresenterInputProtocol?
     private let placeholderText = "Tap to start writing your task description here..."
     
-    
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -77,7 +76,6 @@ class DetailedTaskViewController: UIViewController {
         return textView
     }()
     
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -85,11 +83,23 @@ class DetailedTaskViewController: UIViewController {
         presenter?.viewDidLoad()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
     private func setupNavigationBar() {
         navigationController?.setNavigationBarHidden(true, animated: false)
         view.addSubview(backButton)
     }
     
+    // MARK: -  Action
     @objc private func backButtonTapped() {
         if let navController = navigationController {
             navController.popViewController(animated: true)
