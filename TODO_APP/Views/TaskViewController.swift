@@ -265,20 +265,16 @@ extension TaskViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let task = tasks[indexPath.row]
         
-        // INSTANT HIGHLIGHT - NO RELOAD, NO ANIMATION
         if let cell = tableView.cellForRow(at: indexPath) as? TaskCell {
             let grayColor = UIColor.systemGray4.withAlphaComponent(0.8)
-            // Direct property assignment - NO animation
             cell.contentView.backgroundColor = grayColor
             cell.backgroundColor = grayColor
-            
-            // Create and assign selectedBackgroundView instantly
+        
             let backgroundView = UIView()
             backgroundView.backgroundColor = grayColor
             cell.selectedBackgroundView = backgroundView
         }
         
-        // Blur WITHOUT animation or with very fast animation
         addBlur()
         
         return UIContextMenuConfiguration(
@@ -320,7 +316,6 @@ extension TaskViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     private func restoreCellInstantly(at indexPath: IndexPath) {
-        // INSTANT restoration - direct property assignment
         if let cell = tableView.cellForRow(at: indexPath) as? TaskCell {
             cell.contentView.backgroundColor = .clear
             cell.backgroundColor = .clear
@@ -329,7 +324,6 @@ extension TaskViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willEndContextMenuInteraction configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
-        // Restore ALL visible cells instantly when menu ends
         for indexPath in tableView.indexPathsForVisibleRows ?? [] {
             if let cell = tableView.cellForRow(at: indexPath) as? TaskCell {
                 cell.contentView.backgroundColor = .clear
@@ -409,7 +403,6 @@ extension TaskViewController {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else { return }
         
-        // Check if blur already exists
         if window.viewWithTag(9999) != nil {
             return
         }
@@ -420,7 +413,6 @@ extension TaskViewController {
         blurView.alpha = 0
         window.addSubview(blurView)
         
-        // VERY FAST animation or NO animation
         UIView.animate(withDuration: 0.1) {
             blurView.alpha = 1
         }
