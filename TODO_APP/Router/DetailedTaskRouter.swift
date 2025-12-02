@@ -8,11 +8,10 @@
 import UIKit
 
 protocol DetailedTaskRouterProtocol: AnyObject {
-    func navigateBack()
+    static func createModule(taskId: String) -> UIViewController
 }
 
 final class DetailedTaskRouter: DetailedTaskRouterProtocol {
-    
     weak var viewController: UIViewController?
     
     static func createModule(taskId: String) -> UIViewController {
@@ -30,14 +29,5 @@ final class DetailedTaskRouter: DetailedTaskRouterProtocol {
         
         return view
     }
-    
-    func navigateBack() {
-        DispatchQueue.main.async {
-            if let navigationController = self.viewController?.navigationController {
-                navigationController.popViewController(animated: true)
-            } else {
-                self.viewController?.dismiss(animated: true)
-            }
-        }
-    }
 }
+

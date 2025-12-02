@@ -41,7 +41,7 @@ class TaskViewController: UIViewController {
         tableView.estimatedRowHeight = 125
         return tableView
     }()
-
+    
     private lazy var loadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.translatesAutoresizingMaskIntoConstraints = false
@@ -50,13 +50,19 @@ class TaskViewController: UIViewController {
         return indicator
     }()
     
+    private lazy var footerBackgroundView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = Colors.footerBackground
+        return view
+    }()
+    
     private lazy var footerLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .lightGray
         label.font = .systemFont(ofSize: 14, weight: .medium)
         label.textAlignment = .center
-        label.textColor = Colors.counterColor
+        label.textColor = .white
         return label
     }()
     
@@ -95,7 +101,7 @@ class TaskViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.tintColor = .white
     }
-
+    
     // MARK: - Lifecycle
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -108,16 +114,24 @@ class TaskViewController: UIViewController {
         setupUI()
         presenter?.viewDidLoad()
     }
-
+    
     // MARK: - UI Layouts
     private func setupUI() {
         view.backgroundColor = .black
+        
+        view.addSubview(footerBackgroundView)
         
         [searchBar, tableView, loadingIndicator, footerLabel, addButton].forEach {
             view.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
+            
+            footerBackgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            footerBackgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            footerBackgroundView.topAnchor.constraint(equalTo: footerLabel.topAnchor),
+            footerBackgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
             loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
@@ -191,6 +205,7 @@ extension TaskViewController: TaskPresenterOutputProtocol {
                 self?.footerLabel.textColor = Colors.counterColor
             } else {
                 self?.loadingIndicator.stopAnimating()
+                self?.footerLabel.textColor = .white
             }
         }
     }
@@ -198,6 +213,7 @@ extension TaskViewController: TaskPresenterOutputProtocol {
     func updateFooter(_ total: Int) {
         DispatchQueue.main.async { [weak self] in
             self?.footerLabel.text = "\(total) Задач"
+            self?.footerLabel.textColor = .white
         }
     }
 }

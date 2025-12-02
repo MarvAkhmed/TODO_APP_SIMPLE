@@ -25,30 +25,24 @@ final class CoreDataService: CoreDataServiceProtocol {
     
     // MARK: - Singleton
     static let shared = CoreDataService()
-    
-    // MARK: - Dependencies
+
+    // MARK: - Properties
     private let persistentContainer: NSPersistentContainer
-    private let context: NSManagedObjectContext
     
+    var context: NSManagedObjectContext {
+        persistentContainer.viewContext
+    }
+
     // MARK: - Initialization
-    init(
-        containerName: String = "TODO_APP",
-        persistentContainer: NSPersistentContainer? = nil,
-        context: NSManagedObjectContext? = nil
-    ) {
-        if let persistentContainer = persistentContainer {
-            self.persistentContainer = persistentContainer
-        } else {
-            self.persistentContainer = NSPersistentContainer(name: containerName)
-            self.persistentContainer.loadPersistentStores { _, error in
-                if let error = error {
-                    fatalError("Failed to load Core Data: \(error)")
-                }
+    init() {
+        self.persistentContainer = NSPersistentContainer(name: "TODO_APP")
+        
+        // Load persistent stores
+        self.persistentContainer.loadPersistentStores { _, error in
+            if let error = error {
+                fatalError("Failed to load Core Data: \(error)")
             }
         }
-        
-        self.context = context ?? self.persistentContainer.viewContext
-        
         self.context.automaticallyMergesChangesFromParent = true
         self.context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
     }
@@ -62,14 +56,6 @@ final class CoreDataService: CoreDataServiceProtocol {
         } catch {
             print("Failed to save context: \(error)")
             context.rollback()
-        }
-    }
-    
-    func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
-        persistentContainer.performBackgroundTask { backgroundContext in
-            backgroundContext.automaticallyMergesChangesFromParent = true
-            backgroundContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-            block(backgroundContext)
         }
     }
     
@@ -190,7 +176,6 @@ final class CoreDataService: CoreDataServiceProtocol {
             return
         }
         
-        // Only update description
         entity.taskDescription = newDescription.isEmpty ? nil : newDescription
         
         do {
@@ -305,9 +290,6 @@ private extension CoreDataService {
         configure(newTask, with: remoteTask)
         return .added
     }
-    
-
-  
 }
 
 

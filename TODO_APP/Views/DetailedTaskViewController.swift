@@ -13,6 +13,7 @@ class DetailedTaskViewController: UIViewController {
     var presenter: DetailedTaskPresenterInputProtocol?
     private let placeholderText = "Tap to start writing your task description here..."
     
+    
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -62,30 +63,12 @@ class DetailedTaskViewController: UIViewController {
         return textView
     }()
     
-    private lazy var loadingIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .large)
-        indicator.translatesAutoresizingMaskIntoConstraints = false
-        indicator.color = Colors.counterColor
-        indicator.hidesWhenStopped = true
-        return indicator
-    }()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupKeyboardObservers()
         presenter?.viewDidLoad()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        // Save any pending changes
-        descriptionTextView.resignFirstResponder()
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Setup
@@ -97,7 +80,6 @@ class DetailedTaskViewController: UIViewController {
         contentView.addSubview(titleLabel)
         contentView.addSubview(dateLabel)
         contentView.addSubview(descriptionTextView)
-        view.addSubview(loadingIndicator)
         
         descriptionTextView.delegate = self
         
@@ -125,55 +107,8 @@ class DetailedTaskViewController: UIViewController {
             descriptionTextView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             descriptionTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             descriptionTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
-            
-            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+    
         ])
-        
-        // Add tap gesture to dismiss keyboard when tapping outside
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tapGesture.cancelsTouchesInView = false
-        view.addGestureRecognizer(tapGesture)
-    }
-    
-    private func setupKeyboardObservers() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillShow),
-            name: UIResponder.keyboardWillShowNotification,
-            object: nil
-        )
-        
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillHide),
-            name: UIResponder.keyboardWillHideNotification,
-            object: nil
-        )
-    }
-    
-    // MARK: - Keyboard Handling
-    @objc private func keyboardWillShow(notification: NSNotification) {
-        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        
-        let keyboardHeight = keyboardFrame.height
-        let bottomInset = keyboardHeight - view.safeAreaInsets.bottom
-        
-        scrollView.contentInset.bottom = bottomInset
-        scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
-        
-        // Scroll to show the text view being edited
-        let textViewFrame = descriptionTextView.convert(descriptionTextView.bounds, to: scrollView)
-        scrollView.scrollRectToVisible(textViewFrame, animated: true)
-    }
-    
-    @objc private func keyboardWillHide() {
-        scrollView.contentInset.bottom = 0
-        scrollView.verticalScrollIndicatorInsets.bottom = 0
-    }
-    
-    @objc private func dismissKeyboard() {
-        view.endEditing(true)
     }
 }
 
@@ -220,30 +155,11 @@ extension DetailedTaskViewController: DetailedTaskPresenterOutputProtocol {
         }
     }
     
-    func showLoading(_ isLoading: Bool) {
-        DispatchQueue.main.async {
-            if isLoading {
-                self.loadingIndicator.startAnimating()
-            } else {
-                self.loadingIndicator.stopAnimating()
-            }
-        }
-    }
     
     func displayError(_ message: String) {
         DispatchQueue.main.async { [weak self] in
             let alert = AlertManager.createAlert(for: .error(message: message))
             self?.present(alert, animated: true)
-        }
-    }
-    
-    func navigateBack() {
-        DispatchQueue.main.async {
-            if let navigationController = self.navigationController {
-                navigationController.popViewController(animated: true)
-            } else {
-                self.dismiss(animated: true)
-            }
         }
     }
 }

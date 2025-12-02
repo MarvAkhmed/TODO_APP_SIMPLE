@@ -51,8 +51,6 @@ class TaskCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .lightGray
         label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        label.numberOfLines = 2
-        label.textColor = .lightGray
         label.isHidden = false
         return label
     }()

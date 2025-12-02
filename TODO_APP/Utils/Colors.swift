@@ -9,4 +9,6 @@ import UIKit
 
 final class Colors {
     static let counterColor = UIColor(named: "counterColor")!
+    static let footerBackground = UIColor(named: "footerBackground")!
+    
 }

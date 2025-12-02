@@ -62,6 +62,7 @@ final class TaskPresenter: TaskPresenterInputProtocol, TaskInteractorOutputProto
     func didUpdateTask(_ task: TodoTask, newTitle: String, newDescription: String?) {
         interactor?.updateTask(task, newTitle: newTitle, newDescription: newDescription)
     }
+    
     // MARK: - TaskInteractorOutputProtocol
     func allTasksFetched(_ tasks: [TodoTask], totalCount: Int) {
         displayedTasks = tasks
