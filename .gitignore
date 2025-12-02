@@ -3,3 +3,4 @@ xcuserdata/
 **/xcuserdata/*
 **/xcuserdata/*
 *.xcuserstate
+.DS_Store
