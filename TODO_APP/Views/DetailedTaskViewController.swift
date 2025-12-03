@@ -10,7 +10,7 @@ import UIKit
 class DetailedTaskViewController: UIViewController {
     
     // MARK: - Properties
-    var presenter: DetailedTaskPresenterInputProtocol?
+    weak var presenter: DetailedTaskPresenterInputProtocol?
     private let placeholderText = "Tap to start writing your task description here..."
     
     // MARK: - UI Components

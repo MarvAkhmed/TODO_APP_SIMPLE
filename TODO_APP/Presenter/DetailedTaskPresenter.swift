@@ -67,17 +67,6 @@ final class DetailedTaskPresenter: DetailedTaskPresenterInputProtocol, DetailedT
         detailedTaskInteractorInputProtocol?.fetchTask(by: taskId)
     }
     
-    // In DetailedTaskPresenter.swift, make sure viewDidLoad looks like this:
-
-    func viewDidLoad() {
-        print("🔵 [2] DetailedTaskPresenter: viewDidLoad")
-        print("🔵 [2] Task ID: \(taskId)")
-        print("🔵 [2] Interactor is \(detailedTaskInteractorInputProtocol != nil ? "SET" : "NIL")")
-        print("🔵 [2] Output protocol is \(detailedTaskPresenterOutputProtocol != nil ? "SET" : "NIL")")
-        
-        detailedTaskInteractorInputProtocol?.fetchTask(by: taskId)
-    }
-    
     func didUpdateDescription(_ description: String) {
         guard let task = task else { return }
         detailedTaskInteractorInputProtocol?.updateDescription(for: task, description: description)
