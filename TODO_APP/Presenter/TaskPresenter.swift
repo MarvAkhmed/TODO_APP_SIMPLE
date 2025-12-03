@@ -29,9 +29,33 @@ final class TaskPresenter: TaskPresenterInputProtocol, TaskInteractorOutputProto
     //MARK: -  Dependencies & Properties
     weak var view: TaskPresenterOutputProtocol?
     var interactor: TaskInteractorInputProtocol?
-    var router: TaskRouterProtocol?
+    var router: TaskRouter?
     
     private var displayedTasks: [TodoTask] = []
+    
+    // MARK: - TaskInteractorOutputProtocol
+    func allTasksFetched(_ tasks: [TodoTask], totalCount: Int) {
+        displayedTasks = tasks
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.view?.displayTasks(tasks)
+            self?.view?.updateFooter(totalCount)
+            self?.view?.showLoading(false)
+        }
+    }
+    
+    func tasksFetchFailed(_ error: Error) {
+        DispatchQueue.main.async { [weak self] in
+            self?.view?.displayError(error.localizedDescription)
+            self?.view?.showLoading(false)
+        }
+    }
+    
+    func displayError(_ message: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.view?.displayError(message)
+        }
+    }
     
     //MARK: - TaskPresenterInputProtocol
     func viewDidLoad() {
@@ -61,41 +85,5 @@ final class TaskPresenter: TaskPresenterInputProtocol, TaskInteractorOutputProto
     
     func didUpdateTask(_ task: TodoTask, newTitle: String, newDescription: String?) {
         interactor?.updateTask(task, newTitle: newTitle, newDescription: newDescription)
-    }
-    
-    // MARK: - TaskInteractorOutputProtocol
-    func allTasksFetched(_ tasks: [TodoTask], totalCount: Int) {
-        displayedTasks = tasks
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.view?.displayTasks(tasks)
-            self?.view?.updateFooter(totalCount)
-            self?.view?.showLoading(false)
-        }
-    }
-    
-    func tasksFetchFailed(_ error: Error) {
-        DispatchQueue.main.async { [weak self] in
-            self?.view?.displayError(error.localizedDescription)
-            self?.view?.showLoading(false)
-        }
-    }
-    
-    func taskAdded(_ task: TodoTask) {
-        print(" Presenter: Task added - \(task.title)")
-    }
-    
-    func taskUpdated(_ task: TodoTask) {
-        print(" Presenter: Task updated - \(task.title)")
-    }
-    
-    func taskDeleted(_ task: TodoTask) {
-        print(" Presenter: Task deleted - \(task.title)")
-    }
-    
-    func displayError(_ message: String) {
-        DispatchQueue.main.async { [weak self] in
-            self?.view?.displayError(message)
-        }
     }
 }

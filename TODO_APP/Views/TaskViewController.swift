@@ -6,6 +6,7 @@
 
 import UIKit
 
+// MARK: -  DetailsVC Delegate
 protocol TaskUpdateDelegate: AnyObject {
     func didUpdateTaskDescription(for taskId: UUID, newDescription: String?)
 }
@@ -108,17 +109,12 @@ class TaskViewController: UIViewController {
     }
     
     // MARK: - Lifecycle
-    override func viewWillAppear(_ animated: Bool) {
-         super.viewWillAppear(animated)
-         presenter?.viewDidLoad()
-     }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setNeedsStatusBarAppearanceUpdate()
+        presenter?.viewDidLoad()
         configureNavigationBar()
         setupUI()
-        presenter?.viewDidLoad()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -126,11 +122,10 @@ class TaskViewController: UIViewController {
         removeBlurFast()
         
         for indexPath in tableView.indexPathsForVisibleRows ?? [] {
-            restoreCellBackground(at: indexPath)
+            restoreCellInstantly(at: indexPath)
         }
     }
 
-    
     // MARK: - UI Layouts
     private func setupUI() {
         view.backgroundColor = .black
@@ -285,7 +280,6 @@ extension TaskViewController: UITableViewDataSource, UITableViewDelegate {
                     title: "Редактировать",
                     image: UIImage(systemName: "pencil")
                 ) { _ in
-                    // INSTANT RESTORATION
                     self?.restoreCellInstantly(at: indexPath)
                     self?.removeBlurFast()
                     self?.editTask(task)
@@ -336,7 +330,7 @@ extension TaskViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        88
+        120
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -428,14 +422,5 @@ extension TaskViewController {
         }) { _ in
             blurView.removeFromSuperview()
         }
-    }
-    
-    private func restoreCellBackground(at indexPath: IndexPath) {
-        restoreCellInstantly(at: indexPath)
-    }
-    
-    private func removeBlurAndRestoreCell(at indexPath: IndexPath) {
-        restoreCellInstantly(at: indexPath)
-        removeBlurFast()
     }
 }

@@ -13,10 +13,11 @@ protocol CoreDataServiceProtocol {
     func createTask(from task: TodoTask) -> Bool
     func updateTask(_ task: TodoTask) -> Bool
     func deleteTask(_ task: TodoTask) -> Bool
+    
     func syncTasksWithRemote(_ remoteTasks: [TodoTask]) -> (added: Int, updated: Int, unchanged: Int)
     func taskExists(title: String, description: String?) -> Bool
-    func saveContext()
     
+    /// for detailed task
     func fetchTask(by id: UUID, completion: @escaping (Result<TodoTask?, Error>) -> Void)
     func updateTaskDescription(_ task: TodoTask, newDescription: String, completion: @escaping (Result<TodoTask, Error>) -> Void)
 }
@@ -25,14 +26,14 @@ final class CoreDataService: CoreDataServiceProtocol {
     
     // MARK: - Singleton
     static let shared = CoreDataService()
-
+    
     // MARK: - Properties
     private let persistentContainer: NSPersistentContainer
     
     var context: NSManagedObjectContext {
         persistentContainer.viewContext
     }
-
+    
     // MARK: - Initialization
     init() {
         self.persistentContainer = NSPersistentContainer(name: "TODO_APP")
@@ -43,8 +44,6 @@ final class CoreDataService: CoreDataServiceProtocol {
                 fatalError("Failed to load Core Data: \(error)")
             }
         }
-        self.context.automaticallyMergesChangesFromParent = true
-        self.context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
     }
     
     // MARK: - Context Management
@@ -94,7 +93,7 @@ final class CoreDataService: CoreDataServiceProtocol {
         return saveEntity(entity)
     }
     
-    // MARK: - Smart Sync
+    // MARK: - Sync with remote id
     func syncTasksWithRemote(_ remoteTasks: [TodoTask]) -> (added: Int, updated: Int, unchanged: Int) {
         
         var added = 0, updated = 0, unchanged = 0
@@ -121,6 +120,41 @@ final class CoreDataService: CoreDataServiceProtocol {
         saveContext()
         
         return (added, updated, unchanged)
+    }
+    
+    // MARK: - for detailed task
+    func fetchTask(by id: UUID, completion: @escaping (Result<TodoTask?, Error>) -> Void) {
+        let fetchRequest: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let entity = try context.fetch(fetchRequest).first
+            let todoTask = entity?.toTask()
+            completion(.success(todoTask))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    func updateTaskDescription(_ task: TodoTask, newDescription: String, completion: @escaping (Result<TodoTask, Error>) -> Void) {
+        guard let entity = fetchTaskEntity(by: task.id) else {
+            completion(.failure(NSError(domain: "CoreDataError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Task not found"])))
+            return
+        }
+        entity.taskDescription = newDescription.isEmpty ? nil : newDescription
+        
+        do {
+            try context.save()
+            if let updatedTask = entity.toTask() {
+                completion(.success(updatedTask))
+            } else {
+                completion(.failure(NSError(domain: "CoreDataError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to convert updated task"])))
+            }
+        } catch {
+            context.rollback()
+            completion(.failure(error))
+        }
     }
     
     // MARK: - Duplicate Check
@@ -155,45 +189,21 @@ final class CoreDataService: CoreDataServiceProtocol {
             return false
         }
     }
-    
-    func fetchTask(by id: UUID, completion: @escaping (Result<TodoTask?, Error>) -> Void) {
-        let fetchRequest: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-        fetchRequest.fetchLimit = 1
-        
-        do {
-            let entity = try context.fetch(fetchRequest).first
-            let todoTask = entity?.toTask()
-            completion(.success(todoTask))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-    
-    func updateTaskDescription(_ task: TodoTask, newDescription: String, completion: @escaping (Result<TodoTask, Error>) -> Void) {
-        guard let entity = fetchTaskEntity(by: task.id) else {
-            completion(.failure(NSError(domain: "CoreDataError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Task not found"])))
-            return
-        }
-        
-        entity.taskDescription = newDescription.isEmpty ? nil : newDescription
-        
-        do {
-            try context.save()
-            if let updatedTask = entity.toTask() {
-                completion(.success(updatedTask))
-            } else {
-                completion(.failure(NSError(domain: "CoreDataError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to convert updated task"])))
-            }
-        } catch {
-            context.rollback()
-            completion(.failure(error))
-        }
-    }
 }
 
 // MARK: - Private Helper Methods
 private extension CoreDataService {
+    
+    func saveEntity(_ entity: TaskEntity) -> Bool {
+        do {
+            try context.save()
+            return true
+        } catch {
+            context.rollback()
+            return false
+        }
+    }
+    
     func fetchTaskEntity(by id: UUID) -> TaskEntity? {
         let fetchRequest: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
@@ -228,16 +238,6 @@ private extension CoreDataService {
         entity.userId = Int64(task.userId)
         entity.createdAt = task.createdAt
         entity.remoteId = Int64(task.remoteId ?? 0)
-    }
-    
-    func saveEntity(_ entity: TaskEntity) -> Bool {
-        do {
-            try context.save()
-            return true
-        } catch {
-            context.rollback()
-            return false
-        }
     }
     
     func isDuplicateTask(_ task: TodoTask) -> Bool {

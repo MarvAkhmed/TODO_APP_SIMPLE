@@ -5,7 +5,6 @@
 //  Created by Marwa Awad on 01.12.2025.
 //
 
-import UIKit
 import Foundation
 
 protocol TaskInteractorInputProtocol: AnyObject {
@@ -20,9 +19,6 @@ protocol TaskInteractorInputProtocol: AnyObject {
 protocol TaskInteractorOutputProtocol: AnyObject {
     func allTasksFetched(_ tasks: [TodoTask], totalCount: Int)
     func tasksFetchFailed(_ error: Error)
-    func taskAdded(_ task: TodoTask)
-    func taskUpdated(_ task: TodoTask)
-    func taskDeleted(_ task: TodoTask)
     func displayError(_ message: String)
 }
 
@@ -45,25 +41,10 @@ final class TaskInteractor: TaskInteractorInputProtocol {
     
     // MARK: - TaskInteractorInputProtocol
     func fetchAllTasks() {
-        // load from core data
-        let taskEntities = self.coreDataManager.fetchAllTasks()
-        self.allTasks = taskEntities.compactMap { $0.toTask() }
+        loadAndDisplayCachedTasks()
         
-        // Only fetch from remote if both CoreData and local array are empty
-        if self.allTasks.isEmpty {
-            Task { [weak self] in
-                guard let self = self else { return }
-                let todos = try await self.todoService.fetchAllTodos()
-                let remoteTasks = todos.map { $0.task }
-                _ = self.coreDataManager.syncTasksWithRemote(remoteTasks)
-            
-                let updatedTaskEntities = self.coreDataManager.fetchAllTasks()
-                self.allTasks = updatedTaskEntities.compactMap { $0.toTask() }
-                
-                self.updatePresenterWithCurrentTasks()
-            }
-        } else {
-            self.updatePresenterWithCurrentTasks()
+        Task { [weak self] in
+            await self?.syncTasksWithRemote()
         }
     }
     
@@ -91,7 +72,6 @@ final class TaskInteractor: TaskInteractorInputProtocol {
         
         if coreDataManager.createTask(from: task) {
             allTasks.insert(task, at: 0)
-            presenter?.taskAdded(task)
             updatePresenterWithCurrentTasks()
         } else {
             notifyError("Failed to save task")
@@ -108,7 +88,6 @@ final class TaskInteractor: TaskInteractorInputProtocol {
             updatedTask.description = newDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
             _ = coreDataManager.updateTask(updatedTask)
             allTasks[index] = updatedTask
-            presenter?.taskUpdated(updatedTask)
             updatePresenterWithCurrentTasks()
         }
     }
@@ -120,18 +99,16 @@ final class TaskInteractor: TaskInteractorInputProtocol {
             _ = coreDataManager.updateTask(updatedTask)
             allTasks[index] = updatedTask
             
-            presenter?.taskUpdated(updatedTask)
             updatePresenterWithCurrentTasks()
             
         } else {
-            refreshTasksFromCoreData()
+            loadAndDisplayCachedTasks()
         }
     }
     
     func deleteTask(_ task: TodoTask) {
         _ = coreDataManager.deleteTask(task)
         allTasks.removeAll { $0.id == task.id }
-        presenter?.taskDeleted(task)
         updatePresenterWithCurrentTasks()
     }
     
@@ -139,11 +116,62 @@ final class TaskInteractor: TaskInteractorInputProtocol {
         searchText = text
         updatePresenterWithCurrentTasks()
     }
-
 }
 
 // MARK: - Private Helpers
 private extension TaskInteractor {
+    func loadAndDisplayCachedTasks() {
+        let taskEntities = self.coreDataManager.fetchAllTasks()
+        self.allTasks = taskEntities.compactMap { $0.toTask() }
+        updatePresenterWithCurrentTasks()
+    }
+    
+    func syncTasksWithRemote() async {
+        do {
+            let todos = try await self.todoService.fetchAllTodos()
+            let remoteTasks = todos.map { $0.task }
+            
+            _ = self.coreDataManager.syncTasksWithRemote(remoteTasks)
+            
+            let updatedTaskEntities = self.coreDataManager.fetchAllTasks()
+            self.allTasks = updatedTaskEntities.compactMap { $0.toTask() }
+            
+            await fetchAndUpdateTotalCount()
+            
+        } catch {
+            print("Background sync failed: \(error)")
+        }
+    }
+    
+    func fetchAndUpdateTotalCount() async {
+        do {
+            let totalCount = try await self.todoService.fetchTotalCount()
+            
+            await MainActor.run { [weak self] in
+                guard let self = self else { return }
+                let filtered = self.filteredTasks()
+                self.presenter?.allTasksFetched(filtered, totalCount: totalCount)
+            }
+        } catch {
+            await MainActor.run { [weak self] in
+                guard let self = self else { return }
+                let filtered = self.filteredTasks()
+                self.presenter?.allTasksFetched(filtered, totalCount: self.allTasks.count)
+            }
+        }
+    }
+    
+    func updatePresenterWithCurrentTasks() {
+        let filtered = filteredTasks()
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.presenter?.allTasksFetched(
+                filtered,
+                totalCount: self?.allTasks.count ?? 0
+            )
+        }
+    }
+    
     func isDuplicateTask(title: String, description: String?) -> Bool {
         let normalizedTitle = title.lowercased()
         
@@ -153,25 +181,6 @@ private extension TaskInteractor {
         if existsInCache { return true }
         
         return coreDataManager.taskExists(title: title, description: description)
-    }
-    
-    
-    func refreshTasksFromCoreData() {
-        let taskEntities = coreDataManager.fetchAllTasks()
-        allTasks = taskEntities.compactMap { $0.toTask() }
-        updatePresenterWithCurrentTasks()
-    }
-    
-    func updatePresenterWithCurrentTasks() {
-        let filtered = filteredTasks()
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.presenter?.allTasksFetched(
-                filtered,
-                totalCount: self?.allTasks.count ?? 0,
-
-            )
-        }
     }
     
     func filteredTasks() -> [TodoTask] {

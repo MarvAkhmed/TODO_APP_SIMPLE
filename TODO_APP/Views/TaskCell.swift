@@ -11,9 +11,8 @@ class TaskCell: UITableViewCell {
     // MARK: - Identifier
     static let identifier = "TaskCell"
     
-    // MARK: - Properties
+    // MARK: - Call back
     var onCheckboxTapped: (() -> Void)?
-    var presenter: TaskPresenterInputProtocol?
     
     // MARK: - UI Components
     private lazy var checkboxButton: UIButton = {
@@ -31,7 +30,7 @@ class TaskCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         label.isHidden = false
         return label
     }()
@@ -50,7 +49,7 @@ class TaskCell: UITableViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .lightGray
-        label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
         label.isHidden = false
         return label
     }()

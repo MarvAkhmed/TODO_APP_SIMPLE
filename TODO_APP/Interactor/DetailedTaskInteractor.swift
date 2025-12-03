@@ -4,8 +4,6 @@
 //
 
 import Foundation
-import UIKit
-import CoreData
 
 protocol DetailedTaskInteractorInputProtocol: AnyObject {
     func fetchTask(by id: String)

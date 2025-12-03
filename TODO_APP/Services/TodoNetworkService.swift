@@ -9,6 +9,7 @@ import Foundation
 
 protocol TodoServiceProtocol {
     func fetchAllTodos() async throws -> [Todo]
+    func fetchTotalCount() async throws -> Int
 }
 
 final class TodoNetworkService: TodoServiceProtocol {
@@ -20,7 +21,6 @@ final class TodoNetworkService: TodoServiceProtocol {
         var skip = 0
         var hasMore = true
         
-        
         while hasMore {
             let response = try await fetchTodos(limit: batchSize, skip: skip)
             allTodos.append(contentsOf: response.todos)
@@ -31,6 +31,11 @@ final class TodoNetworkService: TodoServiceProtocol {
             }
         }
         return allTodos
+    }
+    
+    func fetchTotalCount() async throws -> Int {
+        let response = try await fetchTodos(limit: 1, skip: 0)
+        return response.total
     }
 }
 
@@ -61,7 +66,6 @@ private extension TodoNetworkService {
               httpResponse.isSuccessful else {
             throw TodoServiceError.invalidResponse
         }
-        
         return try JSONDecoder().decode(TodosResponse.self, from: data)
     }
 }
