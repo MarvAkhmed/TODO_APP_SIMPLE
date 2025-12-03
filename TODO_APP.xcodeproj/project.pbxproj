@@ -6,10 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		C580D3BB2EE004FC0002399D /* TodoAppTests.xctest in Sources */ = {isa = PBXBuildFile; fileRef = C580D32E2EDFFDFA0002399D /* TodoAppTests.xctest */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		C580D3322EDFFDFB0002399D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -207,7 +203,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C580D3BB2EE004FC0002399D /* TodoAppTests.xctest in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
