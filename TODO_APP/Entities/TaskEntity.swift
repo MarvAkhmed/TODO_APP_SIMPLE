@@ -15,7 +15,6 @@ public class TaskEntity: NSManagedObject {
 
 }
 
-
 extension TaskEntity {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<TaskEntity> {
