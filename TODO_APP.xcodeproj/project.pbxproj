@@ -6,7 +6,22 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C580D3BB2EE004FC0002399D /* TodoAppTests.xctest in Sources */ = {isa = PBXBuildFile; fileRef = C580D32E2EDFFDFA0002399D /* TodoAppTests.xctest */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C580D3322EDFFDFB0002399D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C5A0FB4C2EDD9CAE00991057 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C5A0FB532EDD9CAE00991057;
+			remoteInfo = TODO_APP;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		C580D32E2EDFFDFA0002399D /* TodoAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TodoAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5A0FB542EDD9CAE00991057 /* TODO_APP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TODO_APP.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -20,11 +35,27 @@
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		C580D3922EE0043D0002399D /* Exceptions for "TODO_APP" folder in "Copy Bundle Resources" phase from "TodoAppTests" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = C580D32C2EDFFDFA0002399D /* Resources */;
+			membershipExceptions = (
+				Entities/TODO_APP.xcdatamodeld,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		C580D32F2EDFFDFA0002399D /* TodoAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TodoAppTests;
+			sourceTree = "<group>";
+		};
 		C5A0FB562EDD9CAE00991057 /* TODO_APP */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				C5A0FB662EDD9CB000991057 /* Exceptions for "TODO_APP" folder in "TODO_APP" target */,
+				C580D3922EE0043D0002399D /* Exceptions for "TODO_APP" folder in "Copy Bundle Resources" phase from "TodoAppTests" target */,
 			);
 			path = TODO_APP;
 			sourceTree = "<group>";
@@ -32,6 +63,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		C580D32B2EDFFDFA0002399D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C5A0FB512EDD9CAE00991057 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -46,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				C5A0FB562EDD9CAE00991057 /* TODO_APP */,
+				C580D32F2EDFFDFA0002399D /* TodoAppTests */,
 				C5A0FB552EDD9CAE00991057 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				C5A0FB542EDD9CAE00991057 /* TODO_APP.app */,
+				C580D32E2EDFFDFA0002399D /* TodoAppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,6 +101,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		C580D32D2EDFFDFA0002399D /* TodoAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C580D3342EDFFDFB0002399D /* Build configuration list for PBXNativeTarget "TodoAppTests" */;
+			buildPhases = (
+				C580D32A2EDFFDFA0002399D /* Sources */,
+				C580D32B2EDFFDFA0002399D /* Frameworks */,
+				C580D32C2EDFFDFA0002399D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C580D3332EDFFDFB0002399D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C580D32F2EDFFDFA0002399D /* TodoAppTests */,
+			);
+			name = TodoAppTests;
+			packageProductDependencies = (
+			);
+			productName = TODO_APPTests;
+			productReference = C580D32E2EDFFDFA0002399D /* TodoAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		C5A0FB532EDD9CAE00991057 /* TODO_APP */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C5A0FB672EDD9CB000991057 /* Build configuration list for PBXNativeTarget "TODO_APP" */;
@@ -93,6 +156,10 @@
 				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
+					C580D32D2EDFFDFA0002399D = {
+						CreatedOnToolsVersion = 26.1.1;
+						TestTargetID = C5A0FB532EDD9CAE00991057;
+					};
 					C5A0FB532EDD9CAE00991057 = {
 						CreatedOnToolsVersion = 26.1.1;
 					};
@@ -113,11 +180,19 @@
 			projectRoot = "";
 			targets = (
 				C5A0FB532EDD9CAE00991057 /* TODO_APP */,
+				C580D32D2EDFFDFA0002399D /* TodoAppTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		C580D32C2EDFFDFA0002399D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C5A0FB522EDD9CAE00991057 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -128,6 +203,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C580D32A2EDFFDFA0002399D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C580D3BB2EE004FC0002399D /* TodoAppTests.xctest in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C5A0FB502EDD9CAE00991057 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -137,7 +220,57 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		C580D3332EDFFDFB0002399D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C5A0FB532EDD9CAE00991057 /* TODO_APP */;
+			targetProxy = C580D3322EDFFDFB0002399D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		C580D3352EDFFDFB0002399D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PS354VCTKY;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.marwa.TODO-APPTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TODO_APP.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TODO_APP";
+			};
+			name = Debug;
+		};
+		C580D3362EDFFDFB0002399D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PS354VCTKY;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.marwa.TODO-APPTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TODO_APP.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TODO_APP";
+			};
+			name = Release;
+		};
 		C5A0FB682EDD9CB000991057 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -324,6 +457,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C580D3342EDFFDFB0002399D /* Build configuration list for PBXNativeTarget "TodoAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C580D3352EDFFDFB0002399D /* Debug */,
+				C580D3362EDFFDFB0002399D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C5A0FB4F2EDD9CAE00991057 /* Build configuration list for PBXProject "TODO_APP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

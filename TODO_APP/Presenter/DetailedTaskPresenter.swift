@@ -27,6 +27,7 @@ final class DetailedTaskPresenter: DetailedTaskPresenterInputProtocol, DetailedT
     //MARK: - Properties
     private let taskId: String
     private var task: TodoTask?
+    var taskIdentifierForTests: String { taskId }
     
     //MARK: -  Delegate
     weak var taskUpdateDelegate: TaskUpdateDelegate?

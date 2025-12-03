@@ -277,7 +277,6 @@ private extension CoreDataService {
         
         // If no remoteId match, check by local id
         if let existingTask = localById[remoteTask.id] {
-            existingTask.remoteId = Int64(remoteTask.remoteId ?? 0)
             if hasChanges(existingTask, comparedTo: remoteTask) {
                 configure(existingTask, with: remoteTask)
                 return .updated

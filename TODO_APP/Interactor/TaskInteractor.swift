@@ -34,7 +34,7 @@ final class TaskInteractor: TaskInteractorInputProtocol {
     
     // MARK: - Initializer
     init(todoService: TodoServiceProtocol = TodoNetworkService(),
-         coreDataManager: CoreDataService = CoreDataService.shared) {
+         coreDataManager: CoreDataServiceProtocol = CoreDataService.shared) {
         self.todoService = todoService
         self.coreDataManager = coreDataManager
     }
