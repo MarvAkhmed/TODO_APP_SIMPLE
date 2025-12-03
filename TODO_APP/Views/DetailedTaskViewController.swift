@@ -87,26 +87,18 @@ class DetailedTaskViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
-
+    
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
-
+    
     private func setupNavigationBar() {
         navigationController?.setNavigationBarHidden(true, animated: false)
         view.addSubview(backButton)
     }
     
-    // MARK: -  Action
-    @objc private func backButtonTapped() {
-        if let navController = navigationController {
-            navController.popViewController(animated: true)
-        } else {
-            dismiss(animated: true, completion: nil)
-        }
-    }
     // MARK: - Setup
     private func setupUI() {
         view.backgroundColor = .black
@@ -118,8 +110,6 @@ class DetailedTaskViewController: UIViewController {
         contentView.addSubview(titleLabel)
         contentView.addSubview(dateLabel)
         contentView.addSubview(descriptionTextView)
-        
-       
         
         NSLayoutConstraint.activate([
             backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
@@ -151,6 +141,15 @@ class DetailedTaskViewController: UIViewController {
             descriptionTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             descriptionTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
         ])
+    }
+    
+    // MARK: -  Action
+    @objc private func backButtonTapped() {
+        if let navController = navigationController {
+            navController.popViewController(animated: true)
+        } else {
+            dismiss(animated: true, completion: nil)
+        }
     }
 }
 

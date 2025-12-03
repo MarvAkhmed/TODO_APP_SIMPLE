@@ -15,19 +15,19 @@ final class DetailedTaskRouter: DetailedTaskRouterProtocol {
     weak var viewController: UIViewController?
     
     static func createModule(taskId: String, delegate: TaskUpdateDelegate? = nil) -> UIViewController {
-        let view = DetailedTaskViewController()
+        let detailedTaskViewController = DetailedTaskViewController()
         let interactor = DetailedTaskInteractor()
         let router = DetailedTaskRouter()
         let presenter = DetailedTaskPresenter(taskId: taskId)
         
-        view.presenter = presenter
-        presenter.view = view
-        presenter.interactor = interactor
+        detailedTaskViewController.presenter = presenter
+        presenter.detailedTaskPresenterOutputProtocol = detailedTaskViewController
+        presenter.detailedTaskInteractorInputProtocol = interactor
         presenter.router = router
         presenter.taskUpdateDelegate = delegate
-        interactor.output = presenter
-        router.viewController = view
+        interactor.detailedTaskInteractorOutputProtocol = presenter
+        router.viewController = detailedTaskViewController
         
-        return view
+        return detailedTaskViewController
     }
 }

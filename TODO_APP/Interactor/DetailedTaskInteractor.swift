@@ -2,6 +2,8 @@
 //  DetailedTaskInteractor.swift
 //  TODO_APP
 //
+//  Created by Marwa Awad on 01.12.2025.
+//
 
 import Foundation
 
@@ -19,16 +21,19 @@ protocol DetailedTaskInteractorOutputProtocol: AnyObject {
 
 final class DetailedTaskInteractor: DetailedTaskInteractorInputProtocol {
     
-    weak var output: DetailedTaskInteractorOutputProtocol?
+    // MARK: - Dependencies
+    weak var detailedTaskInteractorOutputProtocol: DetailedTaskInteractorOutputProtocol?
     private let coreDataService: CoreDataServiceProtocol
     
+    // MARK: - Initializer
     init(coreDataService: CoreDataServiceProtocol = CoreDataService.shared) {
         self.coreDataService = coreDataService
     }
     
+    // MARK: -  DetailedTaskInteractorInputProtocol
     func fetchTask(by id: String) {
         guard let taskId = UUID(uuidString: id) else {
-            output?.taskFetchFailed(NSError(domain: "TaskError", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid ID"]))
+            detailedTaskInteractorOutputProtocol?.taskFetchFailed(NSError(domain: "TaskError", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid ID"]))
             return
         }
         
@@ -36,12 +41,12 @@ final class DetailedTaskInteractor: DetailedTaskInteractorInputProtocol {
             switch result {
             case .success(let task):
                 if let task = task {
-                    self?.output?.taskFetched(task)
+                    self?.detailedTaskInteractorOutputProtocol?.taskFetched(task)
                 } else {
-                    self?.output?.taskFetchFailed(NSError(domain: "TaskError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Task not found"]))
+                    self?.detailedTaskInteractorOutputProtocol?.taskFetchFailed(NSError(domain: "TaskError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Task not found"]))
                 }
             case .failure(let error):
-                self?.output?.taskFetchFailed(error)
+                self?.detailedTaskInteractorOutputProtocol?.taskFetchFailed(error)
             }
         }
     }
@@ -50,9 +55,9 @@ final class DetailedTaskInteractor: DetailedTaskInteractorInputProtocol {
         coreDataService.updateTaskDescription(task, newDescription: description) { [weak self] result in
             switch result {
             case .success(let updatedTask):
-                self?.output?.taskDescriptionUpdated(updatedTask)
+                self?.detailedTaskInteractorOutputProtocol?.taskDescriptionUpdated(updatedTask)
             case .failure(let error):
-                self?.output?.taskUpdateFailed(error)
+                self?.detailedTaskInteractorOutputProtocol?.taskUpdateFailed(error)
             }
         }
     }
