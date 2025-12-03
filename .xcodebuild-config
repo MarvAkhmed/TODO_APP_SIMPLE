@@ -1,0 +1,4 @@
+# Only build for iOS simulator
+-destination 'platform=iOS Simulator,name=iPhone 15'
+# Or if you want to use a specific simulator ID:
+# -destination 'id=D6DCE5B8-5F00-4DB4-819D-B7DF16AD1797'
