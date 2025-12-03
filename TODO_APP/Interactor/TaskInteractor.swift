@@ -26,7 +26,7 @@ final class TaskInteractor: TaskInteractorInputProtocol {
     
     weak var presenter: TaskInteractorOutputProtocol?
     private let todoService: TodoServiceProtocol
-    private let coreDataManager: CoreDataService
+    private let coreDataManager: CoreDataServiceProtocol
     
     // MARK: - Data Storage
     private var allTasks: [TodoTask] = []

@@ -28,22 +28,7 @@ final class DetailedTaskPresenter: DetailedTaskPresenterInputProtocol, DetailedT
         self.taskId = taskId
     }
     
-    // MARK: - Input Protocol
-    func viewDidLoad() {
-        interactor?.fetchTask(by: taskId)
-    }
-    
-    
-    func didUpdateDescription(_ description: String) {
-        guard let task = task else { return }
-        interactor?.updateDescription(for: task, description: description)
-        
-        if let taskId = UUID(uuidString: taskId) {
-            taskUpdateDelegate?.didUpdateTaskDescription(for: taskId, newDescription: description)
-        }
-    }
-    
-    // MARK: - Interactor Output
+    // MARK: - DetailedTaskPresenterOutputProtocol
     func taskFetched(_ task: TodoTask) {
         self.task = task
         DispatchQueue.main.async { [weak self] in
@@ -67,4 +52,20 @@ final class DetailedTaskPresenter: DetailedTaskPresenterInputProtocol, DetailedT
             self?.view?.displayError("Failed to update: \(error.localizedDescription)")
         }
     }
+    
+    func viewDidLoad() {
+        interactor?.fetchTask(by: taskId)
+    }
+    
+    func didUpdateDescription(_ description: String) {
+        guard let task = task else { return }
+        interactor?.updateDescription(for: task, description: description)
+        
+        if let taskId = UUID(uuidString: taskId) {
+            taskUpdateDelegate?.didUpdateTaskDescription(for: taskId, newDescription: description)
+        }
+    }
+    
+    // MARK: - Interactor Output
+   
 }
